@@ -1,3 +1,6 @@
+import { saveTaskToFirebase, getTasksFromFirebase, updateTaskStatusInFirebase } from "../Api/task-api.js";
+
+
 const newTask = document.querySelector( '#new-task' );
 const startDate = document.querySelector( '#start-date' );
 const endDate = document.querySelector( '#end-date' );
@@ -11,7 +14,12 @@ const failedList = document.querySelector( '#failed-list' );
 
 submitBtn.addEventListener( 'click', addTask );
 
-function addTask( event ) {
+window.addEventListener( 'load', async () => {
+    const tasks = await getTasksFromFirebase();
+    renderTasks( tasks );
+} );
+
+async function addTask( event ) {
     event.preventDefault();
 
     const taskDiv = document.createElement( 'div' );
@@ -27,11 +35,13 @@ function addTask( event ) {
     completeButton.classList.add( 'complete-button' );
     completeButton.innerHTML = '<i class="fas fa-check"></i>';
     completeButton.addEventListener( 'click', moveTask );
+    completeButton.dataset.id = '';
 
     const failButton = document.createElement( 'button' );
     failButton.classList.add( 'fail-button' );
     failButton.innerHTML = '<i class="fas fa-trash"></i>';
     failButton.addEventListener( 'click', moveTask );
+    failButton.dataset.id = '';
 
     taskDiv.appendChild( taskItem );
     taskDiv.appendChild( completeButton );
@@ -44,12 +54,15 @@ function addTask( event ) {
         startDate: startDate.value,
         endDate: endDate.value,
         description: description.value,
-        priority: priority.value
+        priority: priority.value,
     };
 
+    const taskId = await saveTaskToFirebase( taskDetails );
+    completeButton.dataset.id = taskId;
+    failButton.dataset.id = taskId;
 
-    saveTask( taskDetails );
-    saveTaskToFirebase( taskDetails );
+    const tasks = await getTasksFromFirebase();
+    renderTasks( tasks );
 
 
     newTask.value = '';
@@ -60,25 +73,62 @@ function addTask( event ) {
 
 }
 
-function saveTask( taskDetails ) {
-    let tasks = JSON.parse( localStorage.getItem( 'tasks' ) ) || [];
 
-    tasks.push( taskDetails );
+function renderTasks( tasks ) {
+    pendingList.innerHTML = '';
+    completedList.innerHTML = '';
+    failedList.innerHTML = '';
 
-    localStorage.setItem( 'tasks', JSON.stringify( tasks ) );
+    tasks.forEach( task => {
+        const taskDiv = document.createElement( 'div' );
+        taskDiv.classList.add( 'task' );
+
+        const taskItem = document.createElement( 'li' );
+        taskItem.innerHTML = `
+            <p class="task-name">${task.name} - Priority: ${task.priority}</p>
+            <p class="description">${task.description}</p>
+        `;
+
+        const completeButton = document.createElement( 'button' );
+        completeButton.classList.add( 'complete-button' );
+        completeButton.innerHTML = '<i class="fas fa-check"></i>';
+        completeButton.addEventListener( 'click', moveTask );
+        completeButton.dataset.id = task.id;
+
+        const failButton = document.createElement( 'button' );
+        failButton.classList.add( 'fail-button' );
+        failButton.innerHTML = '<i class="fas fa-trash"></i>';
+        failButton.addEventListener( 'click', moveTask );
+        failButton.dataset.id = task.id;
+
+        taskDiv.appendChild( taskItem );
+        taskDiv.appendChild( completeButton );
+        taskDiv.appendChild( failButton );
+
+
+        if ( task.status === 'pending' ) {
+            pendingList.appendChild( taskDiv );
+        } else if ( task.status === 'completed' ) {
+            completedList.appendChild( taskDiv );
+        } else if ( task.status === 'failed' ) {
+            failedList.appendChild( taskDiv );
+        }
+    } );
 }
 
-
-function moveTask( event ) {
+async function moveTask( event ) {
     const taskItem = event.target.parentElement;
+    const taskId = event.target.dataset.id;
 
     if ( taskItem.parentElement === pendingList ) {
         if ( event.target.classList.contains( 'complete-button' ) ) {
             pendingList.removeChild( taskItem );
             completedList.appendChild( taskItem );
+            await updateTaskStatusInFirebase( taskId, 'completed' );
         } else if ( event.target.classList.contains( 'fail-button' ) ) {
             pendingList.removeChild( taskItem );
             failedList.appendChild( taskItem );
+            await updateTaskStatusInFirebase( taskId, 'failed' );
         }
     } else if ( taskItem.parentElement === completedList ) {
         if ( event.target.classList.contains( 'complete-button' ) ) {
@@ -86,31 +136,17 @@ function moveTask( event ) {
         } else if ( event.target.classList.contains( 'fail-button' ) ) {
             completedList.removeChild( taskItem );
             failedList.appendChild( taskItem );
+            await updateTaskStatusInFirebase( taskId, 'failed' );
         }
     } else if ( taskItem.parentElement === failedList ) {
         if ( event.target.classList.contains( 'complete-button' ) ) {
             failedList.removeChild( taskItem );
             completedList.appendChild( taskItem );
+            await updateTaskStatusInFirebase( taskId, 'completed' );
         } else if ( event.target.classList.contains( 'fail-button' ) ) {
             failedList.removeChild( taskItem );
         }
     }
 }
 
-const database = firebase.database();
 
-function saveTaskToFirebase( taskDetails ) {
-    // Generar una referencia a una ubicación específica en la base de datos de Firebase
-    const newTaskRef = database.ref( 'tasks' ).push();
-
-    // Guardar los detalles de la tarea en la ubicación generada
-    newTaskRef.set( taskDetails )
-        .then( () => {
-            console.log( 'Tarea guardada en Firebase correctamente.' );
-        } )
-        .catch( ( error ) => {
-            console.error( 'Error al guardar la tarea en Firebase:', error );
-        } );
-}
-
-// Llamada a la función saveTaskToFirebase con los detalles de la tarea

@@ -8,9 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css"
         integrity="sha256-46r060N2LrChLLb5zowXQ72/iKKNiw/lAmygmHExk/o=" crossorigin="anonymous" />
-
     <link rel="stylesheet" href="css/styles.css">
-    <script src="js/app.js" defer></script>
+
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script type="module" src="js/app.js" defer></script>
+    <script type="module" src="Api/task-api.js" defer></script>
 
     <title>TODO LIST</title>
 
@@ -71,23 +75,7 @@
     </section>
 
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCVDpZcaqyi_ipRdrJpC-HMzX93cWRGkbc",
-            authDomain: "todo-list-6690c.firebaseapp.com",
-            projectId: "todo-list-6690c",
-            storageBucket: "todo-list-6690c.appspot.com",
-            messagingSenderId: "287210538493",
-            appId: "1:287210538493:web:19887167987bc652af0594",
-            measurementId: "G-KDBWGWG0YM"
-        };
-
-        const app = initializeApp( firebaseConfig );
-        const analytics = getAnalytics( app );
-    </script>
 
 </body>
 
