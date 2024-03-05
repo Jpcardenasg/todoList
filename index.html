@@ -4,14 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TODO List</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css"
+        integrity="sha256-46r060N2LrChLLb5zowXQ72/iKKNiw/lAmygmHExk/o=" crossorigin="anonymous" />
 
     <link rel="stylesheet" href="css/styles.css">
     <script src="js/app.js" defer></script>
 
+    <title>TODO LIST</title>
+
 </head>
 
 <body>
+    <div id="header">
+        <h1 class="title">Just do it!</h1>
+    </div>
+
+    <div id="add-task">
+        <form id="task-form">
+
+            <input class="todo-input" type="text" id="new-task" placeholder="Add a task." required>
+
+            <div class="task-date">
+                <div class="start-date">
+                    <label for="start-date">Start Date:</label>
+                    <input class="todo-input todo-date" type="date" id="start-date" name="start-date" required>
+                </div>
+                <div class="end-date">
+                    <label for="end-date">End Date:</label>
+                    <input class="todo-input todo-date" type="date" id="end-date" name="end-date" required>
+                </div>
+            </div>
+
+            <label for="description">Description:</label>
+            <textarea class="todo-input" id="description" name="description" rows="4" cols="50"
+                placeholder="Enter task description..." required>
+            </textarea>
+
+            <label for="priority">Priority:</label>
+            <select class="todo-input priority" id="priority" name="priority" required>
+                <option value="urgent">Urgent</option>
+                <option value="normal">Normal</option>
+            </select>
+
+            <button id="submit-btn" class="todo-btn" type="submit">Add Task</button>
+
+        </form>
+    </div>
+
+
+    <div id="pending-tasks" class="tasks-container">
+        <h2>Pending Tasks</h2>
+        <ul id="pending-list" class="tasks-list"></ul>
+    </div>
+
+    <section id="completed-failed-container">
+        <div id="completed-tasks" class="tasks-container">
+            <h2>Completed Tasks</h2>
+            <ul id="completed-list" class="tasks-list"></ul>
+        </div>
+        <div id="failed-tasks" class="tasks-container">
+            <h2>Failed Tasks</h2>
+            <ul id="failed-list" class="tasks-list"></ul>
+        </div>
+    </section>
+
 
 </body>
 
