@@ -71,6 +71,24 @@
     </section>
 
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVDpZcaqyi_ipRdrJpC-HMzX93cWRGkbc",
+            authDomain: "todo-list-6690c.firebaseapp.com",
+            projectId: "todo-list-6690c",
+            storageBucket: "todo-list-6690c.appspot.com",
+            messagingSenderId: "287210538493",
+            appId: "1:287210538493:web:19887167987bc652af0594",
+            measurementId: "G-KDBWGWG0YM"
+        };
+
+        const app = initializeApp( firebaseConfig );
+        const analytics = getAnalytics( app );
+    </script>
+
 </body>
 
 </html>

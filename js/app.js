@@ -17,8 +17,6 @@ function addTask( event ) {
     const taskDiv = document.createElement( 'div' );
     taskDiv.classList.add( 'task' );
 
-    // const taskItem = document.createElement( 'li' );
-    // taskItem.textContent = `${newTask.value} - ${description.value} - Priority: ${priority.value}`;
     const taskItem = document.createElement( 'li' );
     taskItem.innerHTML = `
     <p class="task-name">${newTask.value} - Priority: ${priority.value}</p>
@@ -40,6 +38,20 @@ function addTask( event ) {
     taskDiv.appendChild( failButton );
     pendingList.appendChild( taskDiv );
 
+
+    const taskDetails = {
+        name: newTask.value,
+        startDate: startDate.value,
+        endDate: endDate.value,
+        description: description.value,
+        priority: priority.value
+    };
+
+
+    saveTask( taskDetails );
+    saveTaskToFirebase( taskDetails );
+
+
     newTask.value = '';
     startDate.value = '';
     endDate.value = '';
@@ -47,6 +59,15 @@ function addTask( event ) {
     priority.value = 'urgent';
 
 }
+
+function saveTask( taskDetails ) {
+    let tasks = JSON.parse( localStorage.getItem( 'tasks' ) ) || [];
+
+    tasks.push( taskDetails );
+
+    localStorage.setItem( 'tasks', JSON.stringify( tasks ) );
+}
+
 
 function moveTask( event ) {
     const taskItem = event.target.parentElement;
@@ -76,3 +97,20 @@ function moveTask( event ) {
     }
 }
 
+const database = firebase.database();
+
+function saveTaskToFirebase( taskDetails ) {
+    // Generar una referencia a una ubicación específica en la base de datos de Firebase
+    const newTaskRef = database.ref( 'tasks' ).push();
+
+    // Guardar los detalles de la tarea en la ubicación generada
+    newTaskRef.set( taskDetails )
+        .then( () => {
+            console.log( 'Tarea guardada en Firebase correctamente.' );
+        } )
+        .catch( ( error ) => {
+            console.error( 'Error al guardar la tarea en Firebase:', error );
+        } );
+}
+
+// Llamada a la función saveTaskToFirebase con los detalles de la tarea
